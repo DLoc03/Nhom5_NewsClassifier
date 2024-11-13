@@ -21,6 +21,18 @@ def remove_special_chars(text):
     return text
 
 
+st.markdown(
+    """
+    <style>
+    a {
+        text-decoration: none;
+        color: inherit;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 data["TITLE"] = data["TITLE"].apply(remove_special_chars)
 data["PUBLISHER"] = data["PUBLISHER"].apply(remove_special_chars)
 data["CATEGORY"] = data["CATEGORY"].map(
@@ -92,7 +104,12 @@ filtered_data_limited = filtered_data.head(num_headlines_to_show)
 st.write("Headlines for News with filter:")
 
 for index, row in filtered_data_limited.iterrows():
-    st.write(f"- {row['TITLE']}")
+    title = row["TITLE"]
+    url = row["URL"]
+    if pd.notna(url):
+        st.markdown(f"- [{title}]({url})")
+    else:
+        st.write(f"- {title}")
 
 X = data["TITLE"]
 y = data["CATEGORY"]
