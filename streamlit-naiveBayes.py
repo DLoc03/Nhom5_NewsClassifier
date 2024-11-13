@@ -8,18 +8,14 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 import os
+from datetime import datetime
 
-dtsName = "uci-news-aggregator.csv"
-data = pd.read_csv(dtsName)
-
-data = data.dropna(subset=["TITLE", "CATEGORY"])
-
-
-def remove_special_chars(text):
-    if isinstance(text, str):
-        return re.sub(r"[^a-zA-Z0-9\s]", "", text)
-    return text
-
+st.set_page_config(
+    page_title="News Classifier",
+    page_icon="📰",
+    layout="wide",
+    initial_sidebar_state="auto",
+)
 
 st.markdown(
     """
@@ -33,14 +29,32 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+dtsName = "uci-news-aggregator.csv"
+data = pd.read_csv(dtsName)
+
+data = data.dropna(subset=["TITLE", "CATEGORY"])
+
+
+def convert_date(timestamp):
+    date_obj = datetime.fromtimestamp(timestamp / 1000)
+    return date_obj.strftime("%d-%m-%Y")
+
+
+def remove_special_chars(text):
+    if isinstance(text, str):
+        return re.sub(r"[^a-zA-Z0-9\s]", "", text)
+    return text
+
+
 data["TITLE"] = data["TITLE"].apply(remove_special_chars)
 data["PUBLISHER"] = data["PUBLISHER"].apply(remove_special_chars)
+data["TIMESTAMP"] = data["TIMESTAMP"].apply(convert_date)
 data["CATEGORY"] = data["CATEGORY"].map(
     {
-        "b": "business",
-        "t": "science and technology",
-        "e": "entertainment",
-        "m": "health",
+        "b": "Business",
+        "t": "Science and technology",
+        "e": "Entertainment",
+        "m": "Health",
     }
 )
 
@@ -141,5 +155,13 @@ if sample_titles:
     predictions = model.predict(sample_titles_tfidf)
 
     for title, prediction in zip(sample_titles, predictions):
-        st.write(f"News Title: {title}")
-        st.write(f"News Category: {prediction}")
+        st.markdown(
+            f"""
+            <div style="background-color: #d0e7ff; padding: 10px; border-radius: 5px; margin-bottom: 10px; color: black;">
+            <strong>News Title:</strong> {title}
+            <br>
+            <strong>News Category:</strong> {prediction}
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
