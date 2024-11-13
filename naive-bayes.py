@@ -15,8 +15,8 @@ from sklearn.metrics import (
 )
 import time
 
-dtsName = "uci-news-aggregator.csv"
 # Đọc dữ liệu từ CSV
+dtsName = "uci-news-aggregator.csv"
 data = pd.read_csv(dtsName)
 
 # Xem qua thông tin dữ liệu
@@ -70,9 +70,6 @@ y_pred = model.predict(X_test_tfidf)
 
 # Đánh giá độ chính xác và in ra báo cáo phân loại
 accuracy = accuracy_score(y_test, y_pred)
-print(f"Accuracy: {accuracy:.4f}")
-print("\nClassification Report:")
-print(classification_report(y_test, y_pred))
 
 # Các tiêu chí đánh giá khác
 precision = precision_score(
@@ -85,13 +82,16 @@ f1 = f1_score(
     y_test, y_pred, average="weighted"
 )  # F1-Score theo phương pháp "weighted"
 
-print(f"\nPrecision (Weighted): {precision:.4f}")
+print("Classification Report:")
+print(classification_report(y_test, y_pred))
+print(f"\nAccuracy: {accuracy:.4f}")
+print(f"Precision (Weighted): {precision:.4f}")
 print(f"Recall (Weighted): {recall:.4f}")
 print(f"F1-Score (Weighted): {f1:.4f}")
 
 # Dự đoán thử với một vài bài viết mới
 sample_titles = [
-    "FDA Approves New Drug to Combat Rare Genetic Disorder",
+    "\nFDA Approves New Drug to Combat Rare Genetic Disorder",
     "Global Health Crisis: Rising Cases of Diabetes Among Young Adults",
     "Snack stole 2 millions dollar from VietNamA Bank",
 ]
@@ -130,4 +130,18 @@ sns.countplot(x="CATEGORY", data=data)
 plt.title("Distribution of News Categories")
 plt.xlabel("Category")
 plt.ylabel("Count")
+plt.show()
+
+report = classification_report(y_test, y_pred, output_dict=True)
+report_df = pd.DataFrame(report).transpose()
+metrics = report_df[["precision", "recall", "f1-score"]]
+
+# Biểu đồ đánh giá hiệu suất
+plt.figure(figsize=(12, 8))
+metrics.plot(kind="bar", figsize=(10, 6))
+plt.title("Performance Metrics per Category")
+plt.xlabel("Category")
+plt.ylabel("Score")
+plt.xticks(rotation=45)
+plt.legend(title="Metrics")
 plt.show()
