@@ -14,20 +14,17 @@ from sklearn.metrics import (
     f1_score,
 )
 import time
+import joblib
+import json
 
-# Đọc dữ liệu từ CSV
 dtsName = "uci-news-aggregator.csv"
 data = pd.read_csv(dtsName)
 
-# Xem qua thông tin dữ liệu
 print(data.head())
 
-# Tiền xử lý dữ liệu
-# Loại bỏ các giá trị thiếu
 data = data.dropna(subset=["TITLE", "CATEGORY"])
 
 
-# Làm sạch văn bản: loại bỏ ký tự đặc biệt trong tiêu đề và câu chuyện
 def remove_special_chars(text):
     if isinstance(text, str):
         return re.sub(r"[^a-zA-Z0-9\s]", "", text.lower().strip())
@@ -48,12 +45,10 @@ data["CATEGORY"] = data["CATEGORY"].map(
 X = data["TITLE"]  # Dữ liệu đầu vào (tiêu đề)
 y = data["CATEGORY"]  # Nhãn mục tiêu (thể loại)
 
-# Chia tập dữ liệu thành tập huấn luyện và kiểm tra
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42
 )
 
-# Đo thời gian bắt đầu
 start_time = time.time()
 
 # Vector hóa dữ liệu văn bản sử dụng TfidfVectorizer
@@ -108,11 +103,28 @@ end_time = time.time()
 execution_time = end_time - start_time
 print(f"\nTotal Execution Time: {execution_time:.4f} seconds")
 
-# Vẽ confusion matrix bằng heatmap (dùng seaborn)
-cm = confusion_matrix(y_test, y_pred)
+joblib.dump(model, "save_model/naive_bayes_model.joblib")
+joblib.dump(vectorizer, "save_model/nvb_vectorizer.joblib")
+
+metrics_df = pd.DataFrame(
+    {
+        "Accuracy": [accuracy],
+        "Precision (Weighted)": [precision],
+        "Recall (Weighted)": [recall],
+        "F1-Score (Weighted)": [f1],
+    }
+)
+metrics_df.to_csv("save_model/nvb_metrics.csv", index=False)
+
+with open("save_model/nvb_classi_report.json", "w") as f:
+    json.dump(classification_report(y_test, y_pred, output_dict=True), f)
+
+with open("save_model/nvb_train_time.txt", "w") as f:
+    f.write(f"Total Execution Time: {execution_time:.4f} seconds")
+
 plt.figure(figsize=(8, 6))
 sns.heatmap(
-    cm,
+    confusion_matrix(y_test, y_pred),
     annot=True,
     fmt="d",
     cmap="Blues",
@@ -122,26 +134,20 @@ sns.heatmap(
 plt.title("Confusion Matrix")
 plt.xlabel("Predicted Category")
 plt.ylabel("True Category")
-plt.show()
+plt.savefig("chart/confusion_matrix.png")
 
-# Biểu đồ phân phối các thể loại tin tức trong bộ dữ liệu
 plt.figure(figsize=(8, 6))
 sns.countplot(x="CATEGORY", data=data)
 plt.title("Distribution of News Categories")
 plt.xlabel("Category")
 plt.ylabel("Count")
-plt.show()
+plt.savefig("chart/category_distribution.png")
 
-report = classification_report(y_test, y_pred, output_dict=True)
-report_df = pd.DataFrame(report).transpose()
-metrics = report_df[["precision", "recall", "f1-score"]]
-
-# Biểu đồ đánh giá hiệu suất
 plt.figure(figsize=(12, 8))
-metrics.plot(kind="bar", figsize=(10, 6))
+metrics_df.plot(kind="bar", figsize=(10, 6))
 plt.title("Performance Metrics per Category")
 plt.xlabel("Category")
 plt.ylabel("Score")
 plt.xticks(rotation=45)
 plt.legend(title="Metrics")
-plt.show()
+plt.savefig("chart/performance_metrics.png")
