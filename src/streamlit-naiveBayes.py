@@ -30,7 +30,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-dtsName = "../uci-news-aggregator.csv"
+dtsName = "../data/uci-news-aggregator.csv"
 data = pd.read_csv(dtsName)
 
 data = data.dropna(subset=["TITLE", "CATEGORY"])
@@ -126,11 +126,9 @@ for index, row in filtered_data_limited.iterrows():
     else:
         st.write(f"- {title}")
 
-# Load the pre-trained model and vectorizer
 vectorizer = joblib.load("../models/NaiveBayes/nvb_vectorizer.joblib")
 model = joblib.load("../models/NaiveBayes/naive_bayes_model.joblib")
 
-# Classification section
 st.subheader("Classification of news")
 sample_titles = st.text_area(
     "Enter the titles of news articles (one per line):",

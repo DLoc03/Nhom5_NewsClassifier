@@ -3,9 +3,10 @@ import pandas as pd
 import json
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+import seaborn as sns
 
-# ==================== Load Naive Bayes Model ====================
-# Load Naive Bayes model and vectorizer
+# ==================== Tải mô hình Naive Bayes ====================
+# Tải mô hình Naive Bayes và vectorizer
 try:
     nb_model = joblib.load("models/NaiveBayes/naive_bayes_model.joblib")
     nb_vectorizer = joblib.load("models/NaiveBayes/nvb_vectorizer.joblib")
@@ -13,14 +14,14 @@ try:
 except FileNotFoundError as e:
     print(f"Error loading Naive Bayes model/vectorizer: {e}")
 
-# Load Naive Bayes metrics
+# Tải các chỉ số mô hình Naive Bayes
 try:
     metrics_df = pd.read_csv("models/NaiveBayes/nvb_metrics.csv")
     print("Naive Bayes Model Metrics:\n", metrics_df)
 except FileNotFoundError:
     print("Naive Bayes metrics file not found.")
 
-# Load the classification report for Naive Bayes
+# Tải báo cáo phân loại của Naive Bayes
 try:
     with open("models/NaiveBayes/nvb_classi_report.json", "r") as f:
         nb_report = json.load(f)
@@ -29,16 +30,8 @@ try:
 except FileNotFoundError:
     print("Naive Bayes classification report file not found.")
 
-# Load the training time for Naive Bayes
-try:
-    with open("models/NaiveBayes/nvb_train_time.txt", "r") as f:
-        nb_training_time = f.read()
-    print("Naive Bayes Training Time:\n", nb_training_time)
-except FileNotFoundError:
-    print("Naive Bayes training time file not found.")
 
-
-# Display Naive Bayes confusion matrix and other plots
+# Hiển thị ma trận nhầm lẫn Naive Bayes và các biểu đồ khác
 def display_image(file_path, title):
     try:
         img = mpimg.imread(file_path)
@@ -58,8 +51,8 @@ display_image(
     "plots/NaiveBayes/performance_metrics.png", "Naive Bayes Performance Metrics"
 )
 
-# ==================== Load SVM Model ====================
-# Load SVM model and vectorizer
+# ==================== Tải mô hình SVM ====================
+# Tải mô hình SVM và vectorizer
 try:
     svm_model = joblib.load("models/SVM/svm_model.joblib")
     svm_vectorizer = joblib.load("models/SVM/tfidf_title.joblib")
@@ -67,7 +60,7 @@ try:
 except FileNotFoundError as e:
     print(f"Error loading SVM model/vectorizer: {e}")
 
-# Example: using the loaded SVM model for predictions
+# Ví dụ: sử dụng mô hình SVM đã tải để dự đoán
 sample_texts = ["This is a test news title", "New advancements in AI technology"]
 try:
     sample_features = svm_vectorizer.transform(sample_texts)
@@ -77,15 +70,14 @@ try:
 except Exception as e:
     print(f"Error during SVM prediction: {e}")
 
-# Load SVM metrics
+# Tải các chỉ số mô hình SVM
 try:
-    with open("models/SVM/metrics.txt", "r") as f:
-        svm_metrics = f.read()
-    print("SVM Model Metrics:\n", svm_metrics)
+    metrics_svm = pd.read_csv("models/SVM/metrics.csv")
+    print("SVM Model Metrics:\n", metrics_svm)
 except FileNotFoundError:
-    print("SVM metrics file not found.")
+    print("Naive Bayes metrics file not found.")
 
-# Load the classification report for SVM
+# Tải báo cáo phân loại của SVM
 try:
     with open("models/SVM/classification_report.json", "r") as f:
         svm_report = json.load(f)
@@ -94,6 +86,27 @@ try:
 except (FileNotFoundError, json.JSONDecodeError) as e:
     print(f"Error loading SVM classification report: {e}")
 
-# Display SVM confusion matrix and other plots
+# Hiển thị ma trận nhầm lẫn của SVM và các biểu đồ khác
 display_image("plots/SVM/confusion_Matrix.png", "SVM Confusion Matrix")
 display_image("plots/SVM/metrics_comparison.png", "SVM Performance Metrics")
+
+# So sánh hiệu suất của Naive Bayes và SVM
+metrics_names = [
+    "Accuracy",
+    "Training Time (seconds)",
+]
+comparison_data = {
+    "Metrics": metrics_names,
+    "Naive Bayes": [
+        metrics_df["Accuracy"][0],
+        metrics_df["Training Time (seconds)"][0],
+    ],
+    "SVM": [
+        metrics_svm["Accuracy"][0],
+        metrics_svm["Training time"][0],
+    ],
+}
+df_comparison = pd.DataFrame(comparison_data)
+print("Metrics Comparison between Naive Bayes and SVM:")
+print(df_comparison)
+display_image("plots/comparison_metrics.png", "Compare Models")

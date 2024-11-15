@@ -54,10 +54,14 @@ label_encoder = LabelEncoder()
 df["CATEGORY"] = label_encoder.fit_transform(df["CATEGORY"])
 X = df[["TITLE", "HOSTNAME", "PUBLISHER"]]
 y = df["CATEGORY"]
-tfidf_title = TfidfVectorizer(max_features=5000, ngram_range=(1, 2), max_df=0.85, min_df=5)
+tfidf_title = TfidfVectorizer(
+    max_features=5000, ngram_range=(1, 2), max_df=0.85, min_df=5
+)
 X_title = tfidf_title.fit_transform(X["TITLE"])
 X_combined = hstack([X_title])
-X_train, X_test, y_train, y_test = train_test_split(X_combined, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(
+    X_combined, y, test_size=0.2, random_state=42
+)
 C = 1.0
 svm_model = LinearSVC(C=C, max_iter=1000)
 start_time = time.time()
@@ -82,7 +86,9 @@ print("\nClassification Report:\n", json.dumps(class_report_dict, indent=4))
 os.makedirs("models/SVM", exist_ok=True)
 
 
-def save_metrics_and_report_json(metrics, report_dict, metrics_filename, report_filename):
+def save_metrics_and_report_json(
+    metrics, report_dict, metrics_filename, report_filename
+):
     metrics_filepath = os.path.join("models/SVM", metrics_filename)
     report_filepath = os.path.join("models/SVM", report_filename)
     with open(metrics_filepath, "w") as f:
@@ -107,11 +113,18 @@ metrics = {
     "Recall": recall,
     "Training time": training_time,
 }
-save_metrics_and_report_json(metrics, class_report_dict, "metrics.json", "classification_report.json")
+save_metrics_and_report_json(
+    metrics, class_report_dict, "metrics.json", "classification_report.json"
+)
 save_metrics_as_csv(metrics, "metrics.csv")
 
 
-def save_model(model, vectorizer, model_filename="svm_model.joblib", vectorizer_filename="tfidf_title.joblib"):
+def save_model(
+    model,
+    vectorizer,
+    model_filename="svm_model.joblib",
+    vectorizer_filename="tfidf_title.joblib",
+):
     model_filepath = os.path.join("models/SVM", model_filename)
     vectorizer_filepath = os.path.join("models/SVM", vectorizer_filename)
     joblib.dump(model, model_filepath)

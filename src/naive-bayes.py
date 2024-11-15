@@ -34,10 +34,10 @@ def remove_special_chars(text):
 data["TITLE"] = data["TITLE"].apply(remove_special_chars)
 data["CATEGORY"] = data["CATEGORY"].map(
     {
-        "b": "business",
-        "t": "science and technology",
-        "e": "entertainment",
-        "m": "health",
+        "b": "Business",
+        "t": "Science and technology",
+        "e": "Entertainment",
+        "m": "Health",
     }
 )
 
@@ -112,6 +112,7 @@ metrics_df = pd.DataFrame(
         "Precision (Weighted)": [precision],
         "Recall (Weighted)": [recall],
         "F1-Score (Weighted)": [f1],
+        "Training Time (seconds)": [execution_time],
     }
 )
 metrics_df.to_csv("models/NaiveBayes/nvb_metrics.csv", index=False)
@@ -119,8 +120,6 @@ metrics_df.to_csv("models/NaiveBayes/nvb_metrics.csv", index=False)
 with open("models/NaiveBayes/nvb_classi_report.json", "w") as f:
     json.dump(classification_report(y_test, y_pred, output_dict=True), f)
 
-with open("models/NaiveBayes/nvb_train_time.txt", "w") as f:
-    f.write(f"Total Execution Time: {execution_time:.4f} seconds")
 
 plt.figure(figsize=(8, 6))
 sns.heatmap(
@@ -143,8 +142,10 @@ plt.xlabel("Category")
 plt.ylabel("Count")
 plt.savefig("plots/NaiveBayes/category_distribution.png")
 
+metrics_df_filtered = metrics_df.drop(columns=["Training Time (seconds)"])
+
 plt.figure(figsize=(12, 8))
-metrics_df.plot(kind="bar", figsize=(10, 6))
+metrics_df_filtered.plot(kind="bar", figsize=(10, 6))
 plt.title("Performance Metrics per Category")
 plt.xlabel("Category")
 plt.ylabel("Score")
