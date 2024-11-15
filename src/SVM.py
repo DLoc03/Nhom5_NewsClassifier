@@ -22,7 +22,7 @@ import time
 import joblib
 
 # Read data
-df = pd.read_csv("uci-news-aggregator.csv")
+df = pd.read_csv("./data/uci-news-aggregator.csv")
 ps = PorterStemmer()
 
 # Displaying initial dataset structure
