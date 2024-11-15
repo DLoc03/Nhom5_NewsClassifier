@@ -96,4 +96,4 @@ except (FileNotFoundError, json.JSONDecodeError) as e:
 
 # Display SVM confusion matrix and other plots
 display_image("plots/SVM/confusion_Matrix.png", "SVM Confusion Matrix")
-display_image("plots/SVM/performance_Metrics.png", "SVM Performance Metrics")
+display_image("plots/SVM/metrics_comparison.png", "SVM Performance Metrics")
