@@ -5,99 +5,95 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
 # ==================== Load Naive Bayes Model ====================
-
 # Load Naive Bayes model and vectorizer
-nb_model = joblib.load("models/NaiveBayes/naive_bayes_model.joblib")
-nb_vectorizer = joblib.load("models/NaiveBayes/nvb_vectorizer.joblib")
+try:
+    nb_model = joblib.load("models/NaiveBayes/naive_bayes_model.joblib")
+    nb_vectorizer = joblib.load("models/NaiveBayes/nvb_vectorizer.joblib")
+    print("Naive Bayes model and vectorizer loaded successfully.")
+except FileNotFoundError as e:
+    print(f"Error loading Naive Bayes model/vectorizer: {e}")
 
-# Load Naive Bayes metrics and reports
-metrics_df = pd.read_csv("models/NaiveBayes/nvb_metrics.csv")
-print("Naive Bayes Model Metrics:\n", metrics_df)
+# Load Naive Bayes metrics
+try:
+    metrics_df = pd.read_csv("models/NaiveBayes/nvb_metrics.csv")
+    print("Naive Bayes Model Metrics:\n", metrics_df)
+except FileNotFoundError:
+    print("Naive Bayes metrics file not found.")
 
 # Load the classification report for Naive Bayes
-with open("models/NaiveBayes/nvb_classi_report.json", "r") as f:
-    nb_report = json.load(f)
-
-nb_report_df = pd.DataFrame(nb_report).transpose()
-print("Naive Bayes Classification Report:\n", nb_report_df)
+try:
+    with open("models/NaiveBayes/nvb_classi_report.json", "r") as f:
+        nb_report = json.load(f)
+    nb_report_df = pd.DataFrame(nb_report).transpose()
+    print("Naive Bayes Classification Report:\n", nb_report_df)
+except FileNotFoundError:
+    print("Naive Bayes classification report file not found.")
 
 # Load the training time for Naive Bayes
-with open("models/NaiveBayes/nvb_train_time.txt", "r") as f:
-    nb_training_time = f.read()
+try:
+    with open("models/NaiveBayes/nvb_train_time.txt", "r") as f:
+        nb_training_time = f.read()
+    print("Naive Bayes Training Time:\n", nb_training_time)
+except FileNotFoundError:
+    print("Naive Bayes training time file not found.")
 
-print("Naive Bayes Training Time:\n", nb_training_time)
 
 # Display Naive Bayes confusion matrix and other plots
-# Naive Bayes Confusion Matrix Plot
-nb_confusion_matrix_img = mpimg.imread("plots/NaiveBayes/confusion_matrix.png")
-plt.imshow(nb_confusion_matrix_img)
-plt.axis("off")
-plt.title("Naive Bayes Confusion Matrix")
-plt.show()
+def display_image(file_path, title):
+    try:
+        img = mpimg.imread(file_path)
+        plt.imshow(img)
+        plt.axis("off")
+        plt.title(title)
+        plt.show()
+    except FileNotFoundError:
+        print(f"{title} image not found at {file_path}.")
 
-# Naive Bayes Category Distribution Plot
-nb_category_distribution_img = mpimg.imread(
-    "plots/NaiveBayes/category_distribution.png"
+
+display_image("plots/NaiveBayes/confusion_matrix.png", "Naive Bayes Confusion Matrix")
+display_image(
+    "plots/NaiveBayes/category_distribution.png", "Naive Bayes Category Distribution"
 )
-plt.imshow(nb_category_distribution_img)
-plt.axis("off")
-plt.title("Naive Bayes Category Distribution")
-plt.show()
-
-# Naive Bayes Performance Metrics Plot
-nb_performance_metrics_img = mpimg.imread("plots/NaiveBayes/performance_metrics.png")
-plt.imshow(nb_performance_metrics_img)
-plt.axis("off")
-plt.title("Naive Bayes Performance Metrics")
-plt.show()
+display_image(
+    "plots/NaiveBayes/performance_metrics.png", "Naive Bayes Performance Metrics"
+)
 
 # ==================== Load SVM Model ====================
-
 # Load SVM model and vectorizer
-svm_model = joblib.load("models/SVM/svm_model.joblib")
-svm_vectorizer = joblib.load("models/SVM/tfidf_title.joblib")
-
-print("SVM model and vectorizer have been loaded successfully.")
+try:
+    svm_model = joblib.load("models/SVM/svm_model.joblib")
+    svm_vectorizer = joblib.load("models/SVM/tfidf_title.joblib")
+    print("SVM model and vectorizer loaded successfully.")
+except FileNotFoundError as e:
+    print(f"Error loading SVM model/vectorizer: {e}")
 
 # Example: using the loaded SVM model for predictions
 sample_texts = ["This is a test news title", "New advancements in AI technology"]
-sample_features = svm_vectorizer.transform(sample_texts)
-sample_predictions = svm_model.predict(sample_features)
+try:
+    sample_features = svm_vectorizer.transform(sample_texts)
+    sample_predictions = svm_model.predict(sample_features)
+    print("Sample texts:", sample_texts)
+    print("Predicted categories (SVM):", sample_predictions)
+except Exception as e:
+    print(f"Error during SVM prediction: {e}")
 
-# Load SVM metrics if available
-svm_metrics_df = pd.read_csv("models/SVM/svm_metrics.csv")
-print("SVM Model Metrics:\n", svm_metrics_df)
+# Load SVM metrics
+try:
+    with open("models/SVM/metrics.txt", "r") as f:
+        svm_metrics = f.read()
+    print("SVM Model Metrics:\n", svm_metrics)
+except FileNotFoundError:
+    print("SVM metrics file not found.")
 
 # Load the classification report for SVM
-with open("models/SVM/svm_classi_report.json", "r") as f:
-    svm_report = json.load(f)
-
-svm_report_df = pd.DataFrame(svm_report).transpose()
-print("SVM Classification Report:\n", svm_report_df)
-
-# Load the training time for SVM
-with open("models/SVM/svm_train_time.txt", "r") as f:
-    svm_training_time = f.read()
-
-print("SVM Training Time:\n", svm_training_time)
+try:
+    with open("models/SVM/classification_report.txt", "r") as f:
+        svm_report = json.load(f)
+    svm_report_df = pd.DataFrame(svm_report).transpose()
+    print("SVM Classification Report:\n", svm_report_df)
+except (FileNotFoundError, json.JSONDecodeError) as e:
+    print(f"Error loading SVM classification report: {e}")
 
 # Display SVM confusion matrix and other plots
-# SVM Confusion Matrix Plot
-svm_confusion_matrix_img = mpimg.imread("plots/SVM/Confusion_Matrix.png")
-plt.imshow(svm_confusion_matrix_img)
-plt.axis("off")
-plt.title("SVM Confusion Matrix")
-plt.show()
-
-# SVM Performance Metrics Plot
-svm_performance_metrics_img = mpimg.imread("plots/SVM/Performance_Metrics.png")
-plt.imshow(svm_performance_metrics_img)
-plt.axis("off")
-plt.title("SVM Performance Metrics")
-plt.show()
-
-# ==================== Display SVM Predictions ====================
-
-# Print sample predictions for SVM
-print("Sample texts:", sample_texts)
-print("Predicted categories (SVM):", sample_predictions)
+display_image("plots/SVM/Confusion_Matrix.png", "SVM Confusion Matrix")
+display_image("plots/SVM/Performance_Metrics.png", "SVM Performance Metrics")

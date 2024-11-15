@@ -17,7 +17,7 @@ import time
 import joblib
 import json
 
-dtsName = "uci-news-aggregator.csv"
+dtsName = "./data/uci-news-aggregator.csv"
 data = pd.read_csv(dtsName)
 
 print(data.head())

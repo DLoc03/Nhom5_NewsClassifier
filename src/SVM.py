@@ -1,4 +1,9 @@
+import os
+import joblib
 import pandas as pd
+import json
+import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import LinearSVC
@@ -10,17 +15,15 @@ from sklearn.metrics import (
     precision_score,
     recall_score,
 )
-from nltk.corpus import stopwords
 from sklearn.preprocessing import LabelEncoder
-import re
-from scipy.sparse import hstack
-import nltk
+from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
-import seaborn as sns
-import matplotlib.pyplot as plt
+import nltk
+import re
 import time
-import joblib
+from scipy.sparse import hstack
 
+# ==================== Data Preprocessing ====================
 # Read data
 df = pd.read_csv("./data/uci-news-aggregator.csv")
 ps = PorterStemmer()
@@ -77,10 +80,9 @@ X_train, X_test, y_train, y_test = train_test_split(
     X_combined, y, test_size=0.2, random_state=42
 )
 
-# ------------------------------------------------------------------Pre-Processing End------------------------------------------------------------------------------
-
+# ==================== Model Training ====================
 # Setting model parameters for LinearSVC
-C = 1.0  # You can experiment with different C values for optimal results
+C = 1.0
 svm_model = LinearSVC(C=C, max_iter=1000)
 
 # Tracking training time
@@ -103,26 +105,42 @@ print(f"F1 Score (Micro): {f1_micro}")
 print(f"Precision: {precision}")
 print(f"Recall: {recall}")
 print(f"Training time: {training_time} seconds")
-print(
-    "\nClassification Report:\n",
-    classification_report(y_test, y_pred, target_names=label_encoder.classes_),
+
+# Classification report as dictionary
+class_report_dict = classification_report(
+    y_test, y_pred, target_names=label_encoder.classes_, output_dict=True
 )
 
+print("\nClassification Report:\n", json.dumps(class_report_dict, indent=4))
 
-# Save metrics and classification report
-def save_metrics(
-    metrics,
-    classification_report,
-    metrics_filename="metrics.txt",
-    report_filename="classification_report.txt",
+# ==================== Saving Files ====================
+# Tạo thư mục nếu chưa tồn tại
+os.makedirs("models/SVM", exist_ok=True)
+
+
+# Save metrics and classification report as JSON
+def save_metrics_and_report_json(
+    metrics, report_dict, metrics_filename, report_filename
 ):
-    with open(metrics_filename, "w") as f:
-        for metric, value in metrics.items():
-            f.write(f"{metric}: {value}\n")
-    with open(report_filename, "w") as f:
-        f.write(classification_report)
+    metrics_filepath = os.path.join("models/SVM", metrics_filename)
+    report_filepath = os.path.join("models/SVM", report_filename)
+
+    with open(metrics_filepath, "w") as f:
+        json.dump(metrics, f, indent=4)
+    with open(report_filepath, "w") as f:
+        json.dump(report_dict, f, indent=4)
+    print(f"Metrics và báo cáo đã được lưu vào: {metrics_filepath}, {report_filepath}")
 
 
+# Save metrics as CSV
+def save_metrics_as_csv(metrics, filename="metrics.csv"):
+    metrics_filepath = os.path.join("models/SVM", filename)
+    metrics_df = pd.DataFrame([metrics])
+    metrics_df.to_csv(metrics_filepath, index=False)
+    print(f"Metrics đã được lưu vào {metrics_filepath}.")
+
+
+# Metrics dictionary
 metrics = {
     "Accuracy": accuracy,
     "F1 Score (Macro)": f1_macro,
@@ -132,15 +150,36 @@ metrics = {
     "Training time": training_time,
 }
 
-save_metrics(
-    metrics, classification_report(y_test, y_pred, target_names=label_encoder.classes_)
+# Save files
+save_metrics_and_report_json(
+    metrics, class_report_dict, "metrics.json", "classification_report.json"
 )
+save_metrics_as_csv(metrics, "metrics.csv")
 
-# Confusion Matrix
-conf_matrix = confusion_matrix(y_test, y_pred)
+
+# Save Model and Vectorizer
+def save_model(
+    model,
+    vectorizer,
+    model_filename="svm_model.joblib",
+    vectorizer_filename="tfidf_title.joblib",
+):
+    model_filepath = os.path.join("models/SVM", model_filename)
+    vectorizer_filepath = os.path.join("models/SVM", vectorizer_filename)
+
+    joblib.dump(model, model_filepath)
+    joblib.dump(vectorizer, vectorizer_filepath)
+    print(f"Mô hình đã được lưu vào {model_filepath}.")
+    print(f"Vectorizer đã được lưu vào {vectorizer_filepath}.")
+
+
+save_model(svm_model, tfidf_title)
+
+# Save Confusion Matrix as Image
+conf_matrix_filepath = os.path.join("models/SVM", "confusion_matrix.png")
 plt.figure(figsize=(10, 7))
 sns.heatmap(
-    conf_matrix,
+    confusion_matrix(y_test, y_pred),
     annot=True,
     fmt="d",
     cmap="YlGnBu",
@@ -150,19 +189,7 @@ sns.heatmap(
 plt.title("Confusion Matrix")
 plt.xlabel("Predicted Label")
 plt.ylabel("True Label")
+plt.savefig(conf_matrix_filepath)
 plt.show()
 
-
-# Save model and vectorizer
-def save_model(
-    model,
-    tfidf_title,
-    model_filename="svm_model.joblib",
-    vectorizer_filename="tfidf_title.joblib",
-):
-    joblib.dump(model, model_filename)
-    joblib.dump(tfidf_title, vectorizer_filename)
-    print("Mô hình và vectorizer đã được lưu thành công.")
-
-
-save_model(svm_model, tfidf_title)
+print(f"Confusion Matrix đã được lưu vào {conf_matrix_filepath}.")
