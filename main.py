@@ -87,7 +87,7 @@ except FileNotFoundError:
 
 # Load the classification report for SVM
 try:
-    with open("models/SVM/classification_report.txt", "r") as f:
+    with open("models/SVM/classification_report.json", "r") as f:
         svm_report = json.load(f)
     svm_report_df = pd.DataFrame(svm_report).transpose()
     print("SVM Classification Report:\n", svm_report_df)
@@ -95,5 +95,5 @@ except (FileNotFoundError, json.JSONDecodeError) as e:
     print(f"Error loading SVM classification report: {e}")
 
 # Display SVM confusion matrix and other plots
-display_image("plots/SVM/Confusion_Matrix.png", "SVM Confusion Matrix")
-display_image("plots/SVM/Performance_Metrics.png", "SVM Performance Metrics")
+display_image("plots/SVM/confusion_Matrix.png", "SVM Confusion Matrix")
+display_image("plots/SVM/performance_Metrics.png", "SVM Performance Metrics")
