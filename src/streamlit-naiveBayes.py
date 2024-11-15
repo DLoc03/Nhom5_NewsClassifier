@@ -9,6 +9,7 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 import os
 from datetime import datetime
+import joblib
 
 st.set_page_config(
     page_title="News Classifier",
@@ -29,7 +30,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-dtsName = "uci-news-aggregator.csv"
+dtsName = "../uci-news-aggregator.csv"
 data = pd.read_csv(dtsName)
 
 data = data.dropna(subset=["TITLE", "CATEGORY"])
@@ -125,24 +126,11 @@ for index, row in filtered_data_limited.iterrows():
     else:
         st.write(f"- {title}")
 
-X = data["TITLE"]
-y = data["CATEGORY"]
+# Load the pre-trained model and vectorizer
+vectorizer = joblib.load("../models/NaiveBayes/nvb_vectorizer.joblib")
+model = joblib.load("../models/NaiveBayes/naive_bayes_model.joblib")
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
-
-vectorizer = TfidfVectorizer(stop_words="english", max_features=5000)
-X_train_tfidf = vectorizer.fit_transform(X_train)
-X_test_tfidf = vectorizer.transform(X_test)
-
-model = MultinomialNB()
-model.fit(X_train_tfidf, y_train)
-
-y_pred = model.predict(X_test_tfidf)
-
-accuracy = accuracy_score(y_test, y_pred)
-
+# Classification section
 st.subheader("Classification of news")
 sample_titles = st.text_area(
     "Enter the titles of news articles (one per line):",

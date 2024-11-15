@@ -103,8 +103,8 @@ end_time = time.time()
 execution_time = end_time - start_time
 print(f"\nTotal Execution Time: {execution_time:.4f} seconds")
 
-joblib.dump(model, "save_model/naive_bayes_model.joblib")
-joblib.dump(vectorizer, "save_model/nvb_vectorizer.joblib")
+joblib.dump(model, "models/NaiveBayes/naive_bayes_model.joblib")
+joblib.dump(vectorizer, "models/NaiveBayes/nvb_vectorizer.joblib")
 
 metrics_df = pd.DataFrame(
     {
@@ -114,12 +114,12 @@ metrics_df = pd.DataFrame(
         "F1-Score (Weighted)": [f1],
     }
 )
-metrics_df.to_csv("save_model/nvb_metrics.csv", index=False)
+metrics_df.to_csv("models/NaiveBayes/nvb_metrics.csv", index=False)
 
-with open("save_model/nvb_classi_report.json", "w") as f:
+with open("models/NaiveBayes/nvb_classi_report.json", "w") as f:
     json.dump(classification_report(y_test, y_pred, output_dict=True), f)
 
-with open("save_model/nvb_train_time.txt", "w") as f:
+with open("models/NaiveBayes/nvb_train_time.txt", "w") as f:
     f.write(f"Total Execution Time: {execution_time:.4f} seconds")
 
 plt.figure(figsize=(8, 6))
@@ -134,14 +134,14 @@ sns.heatmap(
 plt.title("Confusion Matrix")
 plt.xlabel("Predicted Category")
 plt.ylabel("True Category")
-plt.savefig("chart/confusion_matrix.png")
+plt.savefig("plots/NaiveBayes/confusion_matrix.png")
 
 plt.figure(figsize=(8, 6))
 sns.countplot(x="CATEGORY", data=data)
 plt.title("Distribution of News Categories")
 plt.xlabel("Category")
 plt.ylabel("Count")
-plt.savefig("chart/category_distribution.png")
+plt.savefig("plots/NaiveBayes/category_distribution.png")
 
 plt.figure(figsize=(12, 8))
 metrics_df.plot(kind="bar", figsize=(10, 6))
@@ -150,4 +150,4 @@ plt.xlabel("Category")
 plt.ylabel("Score")
 plt.xticks(rotation=45)
 plt.legend(title="Metrics")
-plt.savefig("chart/performance_metrics.png")
+plt.savefig("plots/NaiveBayes/performance_metrics.png")
