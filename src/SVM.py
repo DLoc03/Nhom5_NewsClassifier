@@ -54,16 +54,20 @@ label_encoder = LabelEncoder()
 df["CATEGORY"] = label_encoder.fit_transform(df["CATEGORY"])
 X = df[["TITLE", "HOSTNAME", "PUBLISHER"]]
 y = df["CATEGORY"]
+
 tfidf_title = TfidfVectorizer(
     max_features=5000, ngram_range=(1, 2), max_df=0.85, min_df=5
 )
+
 X_title = tfidf_title.fit_transform(X["TITLE"])
 X_combined = hstack([X_title])
 X_train, X_test, y_train, y_test = train_test_split(
     X_combined, y, test_size=0.2, random_state=42
 )
 C = 1.0
+
 svm_model = LinearSVC(C=C, max_iter=1000)
+
 start_time = time.time()
 svm_model.fit(X_train, y_train)
 training_time = time.time() - start_time

@@ -48,7 +48,7 @@ display_image(
     "plots/NaiveBayes/category_distribution.png", "Naive Bayes Category Distribution"
 )
 display_image(
-    "plots/NaiveBayes/performance_metrics.png", "Naive Bayes Performance Metrics"
+    "plots/NaiveBayes/metrics_comparison.png", "Naive Bayes Performance Metrics"
 )
 
 # ==================== Tải mô hình SVM ====================
@@ -91,22 +91,37 @@ display_image("plots/SVM/confusion_Matrix.png", "SVM Confusion Matrix")
 display_image("plots/SVM/metrics_comparison.png", "SVM Performance Metrics")
 
 # So sánh hiệu suất của Naive Bayes và SVM
-metrics_names = [
-    "Accuracy",
-    "Training Time (seconds)",
-]
 comparison_data = {
-    "Metrics": metrics_names,
+    "Metrics": [
+        "Accuracy",
+        "F1-Score (Macro)",
+        "F1-Score (Micro)",
+        "Precision (Macro)",
+        "Recall (Macro)",
+        "Training Time (seconds)",
+    ],
     "Naive Bayes": [
         metrics_df["Accuracy"][0],
+        metrics_df["F1-Score (Macro)"][0],
+        metrics_df["F1-Score (Micro)"][0],
+        metrics_df["Precision (Macro)"][0],
+        metrics_df["Recall (Macro)"][0],
         metrics_df["Training Time (seconds)"][0],
     ],
     "SVM": [
         metrics_svm["Accuracy"][0],
+        metrics_svm["F1 Score (Macro)"][0],
+        metrics_svm["F1 Score (Micro)"][0],
+        metrics_svm["Precision"][0],
+        metrics_svm["Recall"][0],
         metrics_svm["Training time"][0],
     ],
 }
+
 df_comparison = pd.DataFrame(comparison_data)
+
+# In ra giá trị của các metrics
 print("Metrics Comparison between Naive Bayes and SVM:")
 print(df_comparison)
+
 display_image("plots/comparison_metrics.png", "Compare Models")

@@ -10,21 +10,30 @@ svm_metrics_path = "models/SVM/metrics.csv"
 naive_bayes_metrics = pd.read_csv(naive_bayes_metrics_path)
 svm_metrics = pd.read_csv(svm_metrics_path)
 
-# Chỉ lấy các giá trị của Accuracy và Training Time
-metrics_names = [
-    "Accuracy",
-    "Training Time (seconds)",
-]
-
-# Tạo một DataFrame để chứa dữ liệu so sánh
+# Tạo một DataFrame để chứa dữ liệu so sánh các metrics
 comparison_data = {
-    "Metrics": metrics_names,
+    "Metrics": [
+        "Accuracy",
+        "F1-Score (Macro)",
+        "F1-Score (Micro)",
+        "Precision (Macro)",
+        "Recall (Macro)",
+        "Training Time (seconds)",
+    ],
     "Naive Bayes": [
         naive_bayes_metrics["Accuracy"][0],
+        naive_bayes_metrics["F1-Score (Macro)"][0],
+        naive_bayes_metrics["F1-Score (Micro)"][0],
+        naive_bayes_metrics["Precision (Macro)"][0],
+        naive_bayes_metrics["Recall (Macro)"][0],
         naive_bayes_metrics["Training Time (seconds)"][0],
     ],
     "SVM": [
         svm_metrics["Accuracy"][0],
+        svm_metrics["F1 Score (Macro)"][0],
+        svm_metrics["F1 Score (Micro)"][0],
+        svm_metrics["Precision"][0],
+        svm_metrics["Recall"][0],
         svm_metrics["Training time"][0],
     ],
 }
@@ -36,14 +45,14 @@ print("Metrics Comparison between Naive Bayes and SVM:")
 print(df_comparison)
 
 # Vẽ biểu đồ so sánh
-plt.figure(figsize=(10, 6))
+plt.figure(figsize=(12, 8))
 df_comparison.set_index("Metrics").plot(
-    kind="bar", figsize=(10, 6), color=["#1f77b4", "#ff7f0e"]
+    kind="bar", figsize=(12, 8), color=["#1f77b4", "#ff7f0e"]
 )
 plt.title("Performance Metrics Comparison between Naive Bayes and SVM")
 plt.ylabel("Score")
 plt.xlabel("Metrics")
-plt.xticks(rotation=0)
+plt.xticks(rotation=45)
 plt.tight_layout()
 plt.savefig("plots/comparison_metrics.png")
 plt.show()
