@@ -4,7 +4,7 @@ import json
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import seaborn as sns
-
+from sklearn.metrics import roc_curve
 # ==================== Tải mô hình Naive Bayes ====================
 # Tải mô hình Naive Bayes và vectorizer
 try:

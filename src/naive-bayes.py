@@ -52,7 +52,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # Vector hóa dữ liệu văn bản sử dụng TfidfVectorizer
-vectorizer = TfidfVectorizer(stop_words="english", max_features=5000)
+vectorizer = TfidfVectorizer(stop_words="english", max_features=10000)
 X_train_tfidf = vectorizer.fit_transform(X_train)
 X_test_tfidf = vectorizer.transform(X_test)
 
