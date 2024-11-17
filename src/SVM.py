@@ -56,7 +56,7 @@ X = df[["TITLE", "HOSTNAME", "PUBLISHER"]]
 y = df["CATEGORY"]
 
 tfidf_title = TfidfVectorizer(
-    max_features=5000, ngram_range=(1, 2), max_df=0.85, min_df=5
+    max_features=10000, ngram_range=(1, 3), max_df=0.85, min_df=5
 )
 
 X_title = tfidf_title.fit_transform(X["TITLE"])
@@ -109,8 +109,8 @@ def save_metrics_as_csv(metrics, filename="metrics.csv"):
     print(f"Metrics saved to {metrics_filepath}.")
 
 
-metrics = {
-    "Accuracy": accuracy,
+metrics =  {
+    "Accuracy": [accuracy],
     "F1 Score (Macro)": f1_macro,
     "F1 Score (Micro)": f1_micro,
     "Precision": precision,
