@@ -125,3 +125,6 @@ print("Metrics Comparison between Naive Bayes and SVM:")
 print(df_comparison)
 
 display_image("plots/comparison_metrics.png", "Compare Models")
+
+# Biểu đồ ROC
+display_image("plots/ROC_comparison.png", "ROC Plots")
